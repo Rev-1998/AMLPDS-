@@ -1,0 +1,60 @@
+ config/config.yaml
+# AMLPDS Configuration File
+
+app:
+  name: "AMLPDS"
+  version: "1.0.0"
+  debug: false
+  
+server:
+  host: "0.0.0.0"
+  port: 5000
+  workers: 4
+  timeout: 120
+  
+security:
+  secret_key: "${SECRET_KEY}"
+  jwt_secret: "${JWT_SECRET_KEY}"
+  jwt_expiry: 3600  # 1 hour
+  csrf_enabled: true
+  rate_limit: "10 per minute"
+  
+model:
+  name: "bert-base-uncased"
+  path: "data/models/bert_phishing_classifier.pt"
+  max_length: 512
+  batch_size: 16
+  device: "auto"  # auto, cpu, cuda
+  
+preprocessing:
+  min_text_length: 20
+  max_text_length: 10000
+  remove_html: true
+  lowercase: true
+  
+adversarial:
+  enabled: true
+  attack_type: "textfooler"
+  lambda_adv: 0.5
+  max_candidates: 50
+  
+database:
+  url: "${DATABASE_URL}"
+  pool_size: 10
+  max_overflow: 20
+  
+redis:
+  url: "${REDIS_URL}"
+  ttl: 3600
+  
+logging:
+  level: "INFO"
+  file: "logs/amlpds.log"
+  max_size: "10MB"
+  backup_count: 5
+  
+monitoring:
+  metrics_enabled: true
+  metrics_port: 9090
+  health_check_interval: 30
+
