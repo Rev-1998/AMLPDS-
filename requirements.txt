@@ -1,0 +1,29 @@
+# Core Dependencies
+flask
+flask-jwt-extended
+werkzeug
+torch
+transformers
+numpy
+textattack
+nltk
+textstat
+shap
+flask-limiter
+flask-wtf
+flask-cors
+python-dotenv
+pandas
+tqdm
+scikit-learn
+matplotlib
+seaborn
+sqlalchemy
+
+# Development and Testing Dependencies
+pytest
+pytest-cov
+flake8
+black
+safety
+bandit
