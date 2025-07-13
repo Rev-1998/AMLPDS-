@@ -1,0 +1,226 @@
+<!-- templates/register.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-md mx-auto bg-white rounded-lg shadow-lg p-8">
+    <h2 class="text-2xl font-bold mb-6 text-center">Create Account</h2>
+    
+    <form id="register-form" onsubmit="handleRegister(event)">
+        <div class="mb-4">
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="username">
+                Username
+            </label>
+            <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+                   id="username" type="text" placeholder="Choose a username" required minlength="3" maxlength="20">
+        </div>
+        
+        <div class="mb-4">
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="email">
+                Email
+            </label>
+            <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+                   id="email" type="email" placeholder="your@email.com" required>
+        </div>
+        
+        <div class="mb-4">
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="password">
+                Password
+            </label>
+            <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+                   id="password" type="password" placeholder="Password" required minlength="8">
+            <p class="text-xs text-gray-600 mt-1">Must be at least 8 characters with uppercase, lowercase, and numbers</p>
+        </div>
+        
+        <div class="mb-6">
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="confirm-password">
+                Confirm Password
+            </label>
+            <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+                   id="confirm-password" type="password" placeholder="Confirm password" required>
+        </div>
+        
+        <div class="flex items-center justify-between">
+            <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full" 
+                    type="submit">
+                Create Account
+            </button>
+        </div>
+        
+        <div class="text-center mt-4">
+            <a href="{{ url_for('auth.login') }}" class="text-blue-600 hover:text-blue-800">
+                Already have an account? Login
+            </a>
+        </div>
+    </form>
+    
+    <div id="error-message" class="hidden mt-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+    </div>
+</div>
+
+<script>
+async function handleRegister(event) {
+    event.preventDefault();
+    
+    const username = document.getElementById('username').value;
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirm-password').value;
+    const errorDiv = document.getElementById('error-message');
+    
+    // Validate passwords match
+    if (password !== confirmPassword) {
+        errorDiv.textContent = 'Passwords do not match';
+        errorDiv.classList.remove('hidden');
+        return;
+    }
+    
+    // Validate password strength
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+    if (!passwordRegex.test(password)) {
+        errorDiv.textContent = 'Password must contain uppercase, lowercase, and numbers';
+        errorDiv.classList.remove('hidden');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/auth/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ username, email, password })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            // Store tokens
+            localStorage.setItem('access_token', data.access_token);
+            localStorage.setItem('refresh_token', data.refresh_token);
+            
+            // Redirect to dashboard
+            window.location.href = '/dashboard';
+        } else {
+            errorDiv.textContent = data.message || 'Registration failed';
+            errorDiv.classList.remove('hidden');
+        }
+    } catch (error) {
+        errorDiv.textContent = 'Network error. Please try again.';
+        errorDiv.classList.remove('hidden');
+    }
+}
+</script>
+{% endblock %}
+
+<!-- templates/about.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <h1 class="text-4xl font-bold mb-8 text-center">About AMLPDS</h1>
+    
+    <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
+        <h2 class="text-2xl font-bold mb-4">Project Overview</h2>
+        <p class="mb-4">
+            The Adversarial Machine Learning for Phishing Detection System (AMLPDS) is an advanced 
+            cybersecurity solution that combines state-of-the-art natural language processing with 
+            adversarial training techniques to detect sophisticated phishing attempts.
+        </p>
+        <p class="mb-4">
+            Traditional phishing detection systems often fail against carefully crafted attacks. 
+            AMLPDS addresses this vulnerability by training on adversarially generated examples, 
+            making it robust against attempts to evade detection.
+        </p>
+    </div>
+    
+    <div class="grid md:grid-cols-2 gap-8 mb-8">
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <h3 class="text-xl font-bold mb-3">
+                <i class="fas fa-brain text-blue-600 mr-2"></i>
+                Technology Stack
+            </h3>
+            <ul class="space-y-2">
+                <li><strong>Model:</strong> BERT (Bidirectional Encoder Representations from Transformers)</li>
+                <li><strong>Framework:</strong> PyTorch & Hugging Face Transformers</li>
+                <li><strong>Adversarial:</strong> TextAttack with TextFooler</li>
+                <li><strong>Explainability:</strong> SHAP (SHapley Additive exPlanations)</li>
+                <li><strong>Backend:</strong> Flask with JWT authentication</li>
+                <li><strong>Frontend:</strong> Tailwind CSS & JavaScript</li>
+            </ul>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <h3 class="text-xl font-bold mb-3">
+                <i class="fas fa-chart-line text-green-600 mr-2"></i>
+                Performance Metrics
+            </h3>
+            <ul class="space-y-2">
+                <li><strong>Accuracy:</strong> 94.38%</li>
+                <li><strong>F1-Score:</strong> 94.9%</li>
+                <li><strong>Precision:</strong> 94.2%</li>
+                <li><strong>Recall:</strong> 95.6%</li>
+                <li><strong>Robust Accuracy:</strong> 88.2% (against adversarial attacks)</li>
+                <li><strong>Average Response Time:</strong> 0.422 seconds</li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
+        <h2 class="text-2xl font-bold mb-4">How It Works</h2>
+        
+        <div class="grid md:grid-cols-3 gap-6">
+            <div class="text-center">
+                <div class="text-4xl text-blue-600 mb-3">
+                    <i class="fas fa-envelope"></i>
+                </div>
+                <h4 class="font-bold mb-2">1. Email Input</h4>
+                <p class="text-sm">Submit email content or upload files for analysis</p>
+            </div>
+            
+            <div class="text-center">
+                <div class="text-4xl text-purple-600 mb-3">
+                    <i class="fas fa-cogs"></i>
+                </div>
+                <h4 class="font-bold mb-2">2. AI Analysis</h4>
+                <p class="text-sm">BERT model analyzes content with adversarial robustness</p>
+            </div>
+            
+            <div class="text-center">
+                <div class="text-4xl text-green-600 mb-3">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h4 class="font-bold mb-2">3. Results & Explanation</h4>
+                <p class="text-sm">Get classification with detailed explanations and recommendations</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow-lg p-8">
+        <h2 class="text-2xl font-bold mb-4">Research & Development</h2>
+        <p class="mb-4">
+            This project was developed as part of the Computer Science Project course at 
+            IU International University. It represents cutting-edge research in adversarial 
+            machine learning applied to cybersecurity.
+        </p>
+        
+        <div class="mt-6">
+            <h3 class="font-bold mb-2">Key Innovations:</h3>
+            <ul class="list-disc pl-5 space-y-1">
+                <li>Integration of adversarial training with phishing detection</li>
+                <li>Real-time explainable AI for security analysts</li>
+                <li>Production-ready deployment with enterprise security features</li>
+                <li>Open-source implementation for transparency and collaboration</li>
+            </ul>
+        </div>
+        
+        <div class="mt-6">
+            <h3 class="font-bold mb-2">Contact:</h3>
+            <p>Developer: Revan Sai Ande</p>
+            <p>Email: 92206451@iu-study.org</p>
+            <p>GitHub: <a href="https://github.com/yourusername/AMLPDS" class="text-blue-600 hover:underline">
+                https://github.com/yourusername/AMLPDS
+            </a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}
