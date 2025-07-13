@@ -1,0 +1,36 @@
+# data/sample_phishing_emails.json
+{
+  "emails": [
+    {
+      "id": 1,
+      "text": "URGENT: Your account has been compromised! Click here immediately to secure your account: http://bit.ly/secure-account. If you don't act within 24 hours, your account will be permanently suspended.",
+      "label": "phishing",
+      "explanation": "Contains urgency keywords, suspicious URL shortener, and threat of account suspension"
+    },
+    {
+      "id": 2,
+      "text": "Congratulations! You've won $1,000,000 in our lottery. To claim your prize, please verify your identity by providing your bank account details at: http://claim-prize-now.com",
+      "label": "phishing",
+      "explanation": "Unrealistic prize claim, requests sensitive financial information"
+    },
+    {
+      "id": 3,
+      "text": "Dear Customer, We've noticed unusual activity on your PayPal account. Please log in to verify your recent transactions: http://paypal-security.fake.com/verify",
+      "label": "phishing",
+      "explanation": "Impersonates PayPal, uses fake domain similar to legitimate one"
+    },
+    {
+      "id": 4,
+      "text": "Hi team, Please find attached the quarterly report for Q2 2025. Let me know if you have any questions. Best regards, John",
+      "label": "legitimate",
+      "explanation": "Normal business communication, no suspicious elements"
+    },
+    {
+      "id": 5,
+      "text": "Your Amazon order #123-4567890 has been shipped and will arrive tomorrow. Track your package at: https://www.amazon.com/track/123-4567890",
+      "label": "legitimate",
+      "explanation": "Legitimate order notification with official Amazon domain"
+    }
+  ]
+}
+
