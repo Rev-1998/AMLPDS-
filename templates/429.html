@@ -1,0 +1,27 @@
+<!-- templates/429.html -->
+{% extends "base.html" %}
+
+{% block title %}429 - Too Many Requests{% endblock %}
+
+{% block content %}
+<div class="text-center py-16">
+    <h1 class="text-6xl font-bold text-gray-800 mb-4">429</h1>
+    <h2 class="text-2xl text-gray-600 mb-8">Too Many Requests</h2>
+    
+    <div class="max-w-md mx-auto mb-8">
+        <i class="fas fa-hand-paper text-6xl text-orange-500 mb-4"></i>
+        <p class="text-gray-600 mb-4">
+            You've made too many requests. Please wait a moment and try again.
+        </p>
+        <p class="text-sm text-gray-500">
+            Rate limit: 10 requests per minute
+        </p>
+    </div>
+    
+    <div class="space-x-4">
+        <a href="{{ url_for('index') }}" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
+            <i class="fas fa-home mr-2"></i> Go Home
+        </a>
+    </div>
+</div>
+{% endblock %}
