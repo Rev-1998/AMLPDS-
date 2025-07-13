@@ -1,0 +1,65 @@
+# data/test_emails.txt
+URGENT SECURITY ALERT: Your Bank Account Access Will Be Suspended!
+
+Dear Valued Customer,
+
+We have detected suspicious activity on your account. Multiple unauthorized login attempts have been made from unknown locations.
+
+To prevent your account from being permanently locked, you must verify your identity immediately.
+
+CLICK HERE TO VERIFY YOUR ACCOUNT >>> http://secure-bank-verify.com/auth
+
+You must complete this verification within 24 hours or your account will be suspended and you may lose access to your funds.
+
+What you need to do:
+1. Click the link above
+2. Enter your username and password
+3. Provide your security questions
+4. Confirm your identity
+
+This is a time-sensitive matter. Act now to protect your account.
+
+Thank you for your immediate attention to this matter.
+
+Security Department
+Your Trusted Bank
+
+---
+
+Subject: Meeting Tomorrow at 2 PM
+
+Hi Sarah,
+
+Just a reminder about our project meeting tomorrow at 2 PM in Conference Room B. We'll be discussing the Q3 roadmap and budget allocations.
+
+Please bring your department's updated reports.
+
+Thanks,
+Michael
+
+---
+
+Congratulations! You Are Our Lucky Winner!
+
+You have been randomly selected as the winner of our $500,000 grand prize!
+
+To claim your winnings, simply:
+- Reply to this email with your full name
+- Provide your phone number
+- Send your bank account details for the transfer
+
+Don't miss this opportunity! Respond within 48 hours or the prize will go to another winner.
+
+Lucky Day Promotions
+
+---
+
+Your Package Delivery Update
+
+Your package from order #8475692 is out for delivery today between 2-6 PM.
+
+If you're not home, the driver will leave it in a secure location or with a neighbor.
+
+Track your package: https://www.fedex.com/tracking/8475692
+
+Thank you for choosing FedEx.
