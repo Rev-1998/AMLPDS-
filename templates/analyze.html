@@ -1,0 +1,143 @@
+<!-- templates/analyze.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <h1 class="text-3xl font-bold mb-8">Analyze Email for Phishing</h1>
+    
+    <div class="bg-white rounded-lg shadow-lg p-8">
+        <form id="analyze-form" onsubmit="analyzeEmail(event)">
+            <div class="mb-6">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="email-text">
+                    Email Content
+                </label>
+                <textarea class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+                          id="email-text" rows="10" placeholder="Paste email content here..." required></textarea>
+            </div>
+            
+            <div class="mb-6">
+                <label class="block text-gray-700 text-sm font-bold mb-2">
+                    Or Upload File
+                </label>
+                <input type="file" id="email-file" accept=".txt,.eml,.msg" class="w-full">
+            </div>
+            
+            <button type="submit" 
+                    class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded focus:outline-none focus:shadow-outline">
+                <i class="fas fa-search mr-2"></i> Analyze
+            </button>
+        </form>
+    </div>
+    
+    <!-- Results Section -->
+    <div id="results-section" class="hidden mt-8">
+        <div class="bg-white rounded-lg shadow-lg p-8">
+            <h2 class="text-2xl font-bold mb-4">Analysis Results</h2>
+            
+            <div id="results-content"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+async function analyzeEmail(event) {
+    event.preventDefault();
+    
+    const emailText = document.getElementById('email-text').value;
+    const token = localStorage.getItem('access_token');
+    
+    if (!token) {
+        alert('Please login to analyze emails');
+        window.location.href = '/auth/login';
+        return;
+    }
+    
+    // Show loading
+    document.getElementById('results-section').classList.remove('hidden');
+    document.getElementById('results-content').innerHTML = '<p class="text-center"><i class="fas fa-spinner fa-spin"></i> Analyzing...</p>';
+    
+    try {
+        const response = await fetch('/api/predict', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ email_text: emailText })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            displayResults(data);
+        } else {
+            document.getElementById('results-content').innerHTML = 
+                `<p class="text-red-600">Error: ${data.error || 'Analysis failed'}</p>`;
+        }
+    } catch (error) {
+        document.getElementById('results-content').innerHTML = 
+            '<p class="text-red-600">Network error. Please try again.</p>';
+    }
+}
+
+function displayResults(data) {
+    const isPhishing = data.prediction === 'phishing';
+    const riskColor = {
+        'CRITICAL': 'red',
+        'HIGH': 'orange',
+        'MEDIUM': 'yellow',
+        'LOW': 'green',
+        'UNCERTAIN': 'gray'
+    }[data.risk_level] || 'gray';
+    
+    let html = `
+        <div class="mb-6 p-4 rounded-lg ${isPhishing ? 'bg-red-100' : 'bg-green-100'}">
+            <h3 class="text-xl font-bold ${isPhishing ? 'text-red-700' : 'text-green-700'}">
+                ${isPhishing ? '⚠️ PHISHING DETECTED' : '✓ LEGITIMATE EMAIL'}
+            </h3>
+            <p class="mt-2">Confidence: ${(data.confidence * 100).toFixed(1)}%</p>
+            <p>Risk Level: <span class="font-bold text-${riskColor}-600">${data.risk_level}</span></p>
+        </div>
+        
+        <div class="mb-6">
+            <h4 class="font-bold mb-2">Summary</h4>
+            <p>${data.explanation.summary}</p>
+        </div>
+        
+        <div class="mb-6">
+            <h4 class="font-bold mb-2">Recommendations</h4>
+            <ul class="list-disc pl-5">
+                ${data.explanation.recommendations.map(rec => `<li>${rec}</li>`).join('')}
+            </ul>
+        </div>
+    `;
+    
+    if (data.explanation.suspicious_keywords.length > 0) {
+        html += `
+            <div class="mb-6">
+                <h4 class="font-bold mb-2">Suspicious Keywords Found</h4>
+                <div class="flex flex-wrap gap-2">
+                    ${data.explanation.suspicious_keywords.map(kw => 
+                        `<span class="bg-red-200 text-red-800 px-2 py-1 rounded">${kw.keyword}</span>`
+                    ).join('')}
+                </div>
+            </div>
+        `;
+    }
+    
+    document.getElementById('results-content').innerHTML = html;
+}
+
+// Handle file upload
+document.getElementById('email-file').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('email-text').value = e.target.result;
+        };
+        reader.readAsText(file);
+    }
+});
+</script>
+{% endblock %}
