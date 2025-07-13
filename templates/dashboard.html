@@ -1,0 +1,128 @@
+<!-- templates/dashboard.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto">
+    <h1 class="text-3xl font-bold mb-8">Dashboard</h1>
+    
+    <!-- Statistics Cards -->
+    <div class="grid md:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white rounded-lg shadow p-6">
+            <h3 class="text-gray-500 text-sm">Total Scans</h3>
+            <p class="text-2xl font-bold text-blue-600" id="total-scans">0</p>
+        </div>
+        <div class="bg-white rounded-lg shadow p-6">
+            <h3 class="text-gray-500 text-sm">Phishing Detected</h3>
+            <p class="text-2xl font-bold text-red-600" id="phishing-detected">0</p>
+        </div>
+        <div class="bg-white rounded-lg shadow p-6">
+            <h3 class="text-gray-500 text-sm">Detection Rate</h3>
+            <p class="text-2xl font-bold text-orange-600" id="detection-rate">0%</p>
+        </div>
+        <div class="bg-white rounded-lg shadow p-6">
+            <h3 class="text-gray-500 text-sm">Avg Confidence</h3>
+            <p class="text-2xl font-bold text-green-600" id="avg-confidence">0%</p>
+        </div>
+    </div>
+    
+    <!-- Charts -->
+    <div class="grid md:grid-cols-2 gap-6">
+        <div class="bg-white rounded-lg shadow p-6">
+            <h3 class="text-xl font-bold mb-4">Detection Trend</h3>
+            <canvas id="trend-chart"></canvas>
+        </div>
+        <div class="bg-white rounded-lg shadow p-6">
+            <h3 class="text-xl font-bold mb-4">Risk Distribution</h3>
+            <canvas id="risk-chart"></canvas>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Load statistics
+async function loadStats() {
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+        window.location.href = '/auth/login';
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/stats', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            document.getElementById('total-scans').textContent = data.total_scans;
+            document.getElementById('phishing-detected').textContent = data.phishing_detected;
+            document.getElementById('detection-rate').textContent = (data.detection_rate * 100).toFixed(1) + '%';
+            document.getElementById('avg-confidence').textContent = (data.average_confidence * 100).toFixed(1) + '%';
+        }
+    } catch (error) {
+        console.error('Failed to load stats:', error);
+    }
+}
+
+// Initialize charts
+function initCharts() {
+    // Trend chart
+    const trendCtx = document.getElementById('trend-chart').getContext('2d');
+    new Chart(trendCtx, {
+        type: 'line',
+        data: {
+            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            datasets: [{
+                label: 'Phishing',
+                data: [12, 19, 15, 25, 22, 30, 28],
+                borderColor: 'rgb(239, 68, 68)',
+                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                tension: 0.3
+            }, {
+                label: 'Legitimate',
+                data: [30, 45, 38, 52, 48, 65, 58],
+                borderColor: 'rgb(34, 197, 94)',
+                backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                tension: 0.3
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+    
+    // Risk chart
+    const riskCtx = document.getElementById('risk-chart').getContext('2d');
+    new Chart(riskCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Critical', 'High', 'Medium', 'Low'],
+            datasets: [{
+                data: [15, 25, 35, 25],
+                backgroundColor: [
+                    'rgb(239, 68, 68)',
+                    'rgb(251, 146, 60)',
+                    'rgb(250, 204, 21)',
+                    'rgb(34, 197, 94)'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+}
+
+// Initialize on load
+document.addEventListener('DOMContentLoaded', function() {
+    loadStats();
+    initCharts();
+});
+</script>
+{% endblock %}
