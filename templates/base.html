@@ -1,0 +1,117 @@
+<!-- templates/base.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AMLPDS - Phishing Detection System{% endblock %}</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-blue-600 text-white shadow-lg">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <i class="fas fa-shield-alt text-2xl mr-2"></i>
+                    <a href="{{ url_for('index') }}" class="text-xl font-bold">AMLPDS</a>
+                </div>
+                
+                <div class="hidden md:flex space-x-6">
+                    <a href="{{ url_for('index') }}" class="hover:text-blue-200 transition">Home</a>
+                    <a href="{{ url_for('analyze') }}" class="hover:text-blue-200 transition">Analyze</a>
+                    <a href="{{ url_for('dashboard') }}" class="hover:text-blue-200 transition">Dashboard</a>
+                    <a href="{{ url_for('about') }}" class="hover:text-blue-200 transition">About</a>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <div id="user-menu" class="hidden">
+                        <span class="mr-2" id="username-display"></span>
+                        <button onclick="logout()" class="bg-red-500 hover:bg-red-600 px-3 py-1 rounded text-sm">
+                            Logout
+                        </button>
+                    </div>
+                    <div id="login-button">
+                        <a href="{{ url_for('auth.login') }}" class="bg-green-500 hover:bg-green-600 px-4 py-2 rounded">
+                            Login
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="container mx-auto px-4 mt-4">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} bg-{{ 'green' if category == 'success' else 'red' }}-100 
+                                border border-{{ 'green' if category == 'success' else 'red' }}-400 
+                                text-{{ 'green' if category == 'success' else 'red' }}-700 px-4 py-3 rounded relative" 
+                         role="alert">
+                        <span class="block sm:inline">{{ message }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+    
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        {% block content %}{% endblock %}
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white mt-12">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex justify-between items-center">
+                <p>&copy; 2025 AMLPDS. All rights reserved.</p>
+                <div class="flex space-x-4">
+                    <a href="#" class="hover:text-gray-400"><i class="fab fa-github"></i></a>
+                    <a href="#" class="hover:text-gray-400"><i class="fab fa-linkedin"></i></a>
+                    <a href="#" class="hover:text-gray-400"><i class="fab fa-twitter"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    
+    <script>
+        // Check authentication status
+        const token = localStorage.getItem('access_token');
+        if (token) {
+            document.getElementById('user-menu').classList.remove('hidden');
+            document.getElementById('login-button').classList.add('hidden');
+            
+            // Decode JWT to get username
+            try {
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                document.getElementById('username-display').textContent = payload.sub || 'User';
+            } catch (e) {
+                console.error('Error decoding token:', e);
+            }
+        }
+        
+        function logout() {
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('refresh_token');
+            window.location.href = '/';
+        }
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
